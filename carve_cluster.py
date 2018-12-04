@@ -2,13 +2,17 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon May 14 15:56:44 2018
+Modified on Tues Dec 04 11:11:13 2018
 
 @author: ernesto
 """
 ##############################################################################
-# This code reads a user given xyz file with a central metallic center
+# This code reads a user-INPUT xyz file with a central metallic center
 # and extracts clusters from the center out based on the atom name (solvent)
-# for example O for OH or H2O. 
+# for example O for OH or H2O.
+
+# Modified to include other species in the solvated cluster, i.e. al-n(h20)
+# with na at different distances.
 ##############################################################################
 import sys, os 
 import numpy as np
@@ -18,9 +22,9 @@ import math
 #-----------------------------------------------------------------------------#
 #Some directives to get data from xyz file
 
-print('In this code you need to input: ' \
-      'Name of the xyz input file as sys.argv[1] ' \
-      'Number of solvated molecules for the cluster '\
+print('In this code you need to INPUT: ' \
+      'Name of the xyz file as sys.argv[1] ' \
+      'Number of solvent molecules around the metal center'\
       'Label of the central atom')
 #print('Input the name of the xyz file to be carved out \n')
 infile = open(sys.argv[1], 'r')
@@ -30,7 +34,7 @@ l_atom = sys.argv[3]
 print(f'Working on file {infile.name}')
 
 #-----------------------------------------------------------------------------#
-# Initializing input file reading and outputfile
+# Initializing input file reading and outputting file
 infile_lines = infile.readlines()
 if infile_lines:
     if infile_lines[0]:
