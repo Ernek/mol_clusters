@@ -2,18 +2,21 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon May 14 15:56:44 2018
-Modified on Tues Dec 04 11:11:13 2018
+Modified on Tues October 01 2018
 
 @author: ernesto
 """
 ##############################################################################
-# This code reads a user-INPUT xyz file with a central metallic center
+# This code reads a user-INPUT xyz file with 
+#     a) center defined by different label / or 
+#     b) center defined by indexed atom 
 # and extracts clusters from the center out based on the atom name (solvent)
 # for example O for OH or H2O.
-
-# Modified to include other species in the solvated cluster, i.e. al-n(h20)
-# with na at different distances.
+# -- Modified to include other species in the solvated cluster, i.e. al-n(h20)
+#     with na at different distances.
 ##############################################################################
+
+#--------- Importing modules--------------------------------------------------#
 import sys, os 
 import numpy as np
 import pandas as pd
@@ -24,13 +27,14 @@ import math
 
 print('In this code you need to INPUT: ' \
       'Name of the xyz file as sys.argv[1] ' \
-      'Number of solvent molecules around the metal center'\
-      'Label of the central atom')
-#print('Input the name of the xyz file to be carved out \n')
+      'Number of solvent molecules around the center: sys.argv[2] '\
+      'Label/Index of the central atom: sys.argv[3] '\
+      'If you need to include an extra differently labeled atom: sys.argv[4] = yes / no ' \
+      'Label of the extra atom to add to the cluster: sys.argv[5] = Label / or type "no" '\)
+
 infile = open(sys.argv[1], 'r')
-#print('How many molecules you want the cluster to be formed of \n')
 mol_number = sys.argv[2]
-l_atom = sys.argv[3]        #Label of the central atom
+l_atom = sys.argv[3]        #Label/Index of the central atom
 extra_atom = sys.argv[4]    #Add an extra atom label to the xyz / yes or no
 e_atom = sys.argv[5]        #Label of the extra atom to add in each cluster or type no
 
