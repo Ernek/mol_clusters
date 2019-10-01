@@ -48,7 +48,7 @@ if infile_lines:
         N = int(infile_lines[0].split()[0])
 else:
     print(f"The file {infile.name} doesn't have content, or there is a " \
-           "problem with the initial N in file.xyz")
+           f"problem with the initial N in {infile.name}.xyz")
 
 snaps = int(len(infile_lines)/(N+2))
 print(f'There are {snaps} snapshots in the {infile.name} file')
@@ -58,7 +58,7 @@ try:
     os.remove(outf_name)
     print(f'Previous file {outf_name} was removed')
 except OSError:
-    print(f"Output file didn't exist before")
+    print(f"Good, Output file didn't exist before")
     pass
 os.system(f'mkdir cluster_N_{mol_number}')
     
@@ -76,7 +76,7 @@ for i in range(snaps):
             continue
         snap_xyz.append(infile_lines[i*(N+2)+j].split())                        
     dataf_xyz = pd.DataFrame(data = snap_xyz, columns = ['Label', 'X', 'Y', 'Z'], dtype = float)
-    print(dataf_xyz[dataf_xyz['Label'] == 'Li'].values)
+    #print(dataf_xyz[dataf_xyz['Label'] == 'Li'].values)
     l = np.zeros((len(dataf_xyz[dataf_xyz['Label']=='O']), 2), dtype=float)
     for j in range(len(dataf_xyz[dataf_xyz['Label']=='O'])):
         distance = math.sqrt(math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['X']-dataf_xyz[dataf_xyz['Label'] == l_atom]['X'], 2) + \
