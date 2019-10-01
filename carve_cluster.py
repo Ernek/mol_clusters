@@ -30,7 +30,7 @@ print('In this code you need to INPUT: ' \
       'Number of solvent molecules around the center: sys.argv[2] '\
       'Label/Index of the central atom: sys.argv[3] '\
       'If you need to include an extra differently labeled atom: sys.argv[4] = yes / no ' \
-      'Label of the extra atom to add to the cluster: sys.argv[5] = Label / or type "no" '\)
+      'Label of the extra atom to add to the cluster: sys.argv[5] = Label / or type "no" ')
 
 infile = open(sys.argv[1], 'r')
 mol_number = sys.argv[2]
@@ -76,36 +76,74 @@ for i in range(snaps):
             continue
         snap_xyz.append(infile_lines[i*(N+2)+j].split())                        
     dataf_xyz = pd.DataFrame(data = snap_xyz, columns = ['Label', 'X', 'Y', 'Z'], dtype = float)
-    #print(dataf_xyz[dataf_xyz['Label'] == 'Li'].values)
-    l = np.zeros((len(dataf_xyz[dataf_xyz['Label']=='O']), 2), dtype=float)
-    for j in range(len(dataf_xyz[dataf_xyz['Label']=='O'])):
-        distance = math.sqrt(math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['X']-dataf_xyz[dataf_xyz['Label'] == l_atom]['X'], 2) + \
-                   math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['Y']-dataf_xyz[dataf_xyz['Label'] == l_atom]['Y'], 2) + \
-                   math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['Z']-dataf_xyz[dataf_xyz['Label'] == l_atom]['Z'], 2)  )
-        l[j][0] = dataf_xyz[dataf_xyz['Label']=='O'].index[j]
-        l[j][1] = distance
-#   print(np.shape(l))
-    d_array = l[l[:,1].argsort()]
-    p = np.zeros((len(dataf_xyz[dataf_xyz['Label']=='H']), 2), dtype=float)
-    cluster = pd.DataFrame(columns = ['Label','X', 'Y', 'Z'])
-    cluster = cluster.append(dataf_xyz[dataf_xyz['Label'] == l_atom])
-    for k in range(int(mol_number)):
-        for m in range(len(dataf_xyz[dataf_xyz['Label']=='H'])):
-            o_h_distance = math.sqrt(math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['X']-dataf_xyz.iloc[int(d_array[:][k][0])]['X'], 2) + \
-                           math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['Y']-dataf_xyz.iloc[int(d_array[:][k][0])]['Y'], 2) + \
-                           math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['Z']-dataf_xyz.iloc[int(d_array[:][k][0])]['Z'], 2)  )
-            p[m][0] = dataf_xyz[dataf_xyz['Label']=='H'].index[m]
-            p[m][1] = o_h_distance
-#        print(np.shape(p))
-        d_array_H = p[p[:,1].argsort()]
-        s = []
-        for o in range(len(d_array_H[d_array_H[:,1] < 1.2][:,0])):
-            s.append(int(d_array_H[d_array_H[:,1] < 1.2][:,0][o]))
-        b = int(d_array[:][k][0])
-#        print(type(dataf_xyz.iloc[[b]]), '\n', type(dataf_xyz.iloc[s]))
-#        print(dataf_xyz.iloc[[b]], '\n', dataf_xyz.iloc[s])
-        cluster = cluster.append(dataf_xyz.iloc[[b]], ignore_index = True)
-        cluster = cluster.append(dataf_xyz.iloc[s], ignore_index = True)
+
+
+    if (sys.argv[3].isdigit() == False):
+        l = np.zeros((len(dataf_xyz[dataf_xyz['Label']=='O']), 2), dtype=float)
+        for j in range(len(dataf_xyz[dataf_xyz['Label']=='O'])):
+            distance = math.sqrt(math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['X']-dataf_xyz[dataf_xyz['Label'] == l_atom]['X'], 2) + \
+                       math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['Y']-dataf_xyz[dataf_xyz['Label'] == l_atom]['Y'], 2) + \
+                       math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['Z']-dataf_xyz[dataf_xyz['Label'] == l_atom]['Z'], 2)  )
+            l[j][0] = dataf_xyz[dataf_xyz['Label']=='O'].index[j]
+            l[j][1] = distance
+        d_array = l[l[:,1].argsort()]
+        p = np.zeros((len(dataf_xyz[dataf_xyz['Label']=='H']), 2), dtype=float)
+        cluster = pd.DataFrame(columns = ['Label','X', 'Y', 'Z'])
+        cluster = cluster.append(dataf_xyz[dataf_xyz['Label'] == l_atom])
+        for k in range(int(mol_number)):
+            for m in range(len(dataf_xyz[dataf_xyz['Label']=='H'])):
+                o_h_distance = math.sqrt(math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['X']-dataf_xyz.iloc[int(d_array[:][k][0])]['X'], 2) + \
+                               math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['Y']-dataf_xyz.iloc[int(d_array[:][k][0])]['Y'], 2) + \
+                               math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['Z']-dataf_xyz.iloc[int(d_array[:][k][0])]['Z'], 2)  )
+                p[m][0] = dataf_xyz[dataf_xyz['Label']=='H'].index[m]
+                p[m][1] = o_h_distance
+            d_array_H = p[p[:,1].argsort()]
+            s = []
+            for o in range(len(d_array_H[d_array_H[:,1] < 1.2][:,0])):
+                s.append(int(d_array_H[d_array_H[:,1] < 1.2][:,0][o]))
+            b = int(d_array[:][k][0])
+            cluster = cluster.append(dataf_xyz.iloc[[b]], ignore_index = True)
+            cluster = cluster.append(dataf_xyz.iloc[s], ignore_index = True)
+
+    else:  #If sys.argv[3] is the index of the central atom
+        orig_label = dataf_xyz.iloc[int(sys.argv[3])+1, dataf_xyz.columns.get_loc('Label')]
+        dataf_xyz.iloc[int(sys.argv[3])+1, dataf_xyz.columns.get_loc('Label')] = 'Ix'
+        l_atom = 'Ix'
+        l = np.zeros((len(dataf_xyz[dataf_xyz['Label'] == 'O']), 2), dtype=float)
+        for j in range(len(dataf_xyz[dataf_xyz['Label'] == 'O'])):
+            distance = math.sqrt(math.pow(
+                dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['X'] - dataf_xyz[dataf_xyz['Label'] == l_atom]['X'], 2) + \
+                                 math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['Y'] -
+                                          dataf_xyz[dataf_xyz['Label'] == l_atom]['Y'], 2) + \
+                                 math.pow(dataf_xyz[dataf_xyz['Label'] == 'O'].iloc[j]['Z'] -
+                                          dataf_xyz[dataf_xyz['Label'] == l_atom]['Z'], 2))
+            l[j][0] = dataf_xyz[dataf_xyz['Label'] == 'O'].index[j]
+            l[j][1] = distance
+        d_array = l[l[:, 1].argsort()]
+        p = np.zeros((len(dataf_xyz[dataf_xyz['Label'] == 'H']), 2), dtype=float)
+        cluster = pd.DataFrame(columns=['Label', 'X', 'Y', 'Z'])
+        cluster = cluster.append(dataf_xyz[dataf_xyz['Label'] == l_atom])
+        cluster.iloc[0, cluster.columns.get_loc('Label')] = orig_label
+        for k in range(int(mol_number)):
+            for m in range(len(dataf_xyz[dataf_xyz['Label'] == 'H'])):
+                o_h_distance = math.sqrt(math.pow(
+                    dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['X'] - dataf_xyz.iloc[int(d_array[:][k][0])]['X'], 2) + \
+                                         math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['Y'] -
+                                                  dataf_xyz.iloc[int(d_array[:][k][0])]['Y'], 2) + \
+                                         math.pow(dataf_xyz[dataf_xyz['Label'] == 'H'].iloc[m]['Z'] -
+                                                  dataf_xyz.iloc[int(d_array[:][k][0])]['Z'], 2))
+                p[m][0] = dataf_xyz[dataf_xyz['Label'] == 'H'].index[m]
+                p[m][1] = o_h_distance
+            #            print(np.shape(p))
+            d_array_H = p[p[:, 1].argsort()]
+            s = []
+            for o in range(len(d_array_H[d_array_H[:, 1] < 1.2][:, 0])):
+                s.append(int(d_array_H[d_array_H[:, 1] < 1.2][:, 0][o]))
+            b = int(d_array[:][k][0])
+            #            print(type(dataf_xyz.iloc[[b]]), '\n', type(dataf_xyz.iloc[s]))
+            #            print(dataf_xyz.iloc[[b]], '\n', dataf_xyz.iloc[s])
+            cluster = cluster.append(dataf_xyz.iloc[[b]], ignore_index=True)
+            cluster = cluster.append(dataf_xyz.iloc[s], ignore_index=True)
 # -----------------------------------------------------------------------------#
 # Imprime data the l_atom, O, and H to form requested number of molecules in the cluster
 #    print(type(cluster))
