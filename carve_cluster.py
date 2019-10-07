@@ -25,16 +25,16 @@ import math
 #-----------------------------------------------------------------------------#
 #Some directives to get data from xyz file
 
-print('In this code you need to INPUT: ' \
-      'Name of the xyz file as sys.argv[1] ' \
-      'Number of solvent molecules around the center: sys.argv[2] '\
-      'Label/Index of the central atom: sys.argv[3] '\
-      'If you need to include an extra differently labeled atom: sys.argv[4] = yes / no ' \
-      'Label of the extra atom to add to the cluster: sys.argv[5] = Label / or type "no" ')
+print('In this code you need to INPUT: \n' \
+      'Name of the xyz file as sys.argv[1] \n' \
+      'Number of solvent molecules around the center: sys.argv[2] \n'\
+      'Label/Index of the central atom: sys.argv[3] \n'\
+      'If you need to include an extra differently labeled atom: sys.argv[4] = yes / no \n' \
+      'Label of the extra atom to add to the cluster: sys.argv[5] = Label / or type "no" \n')
 
 infile = open(sys.argv[1], 'r')
 mol_number = sys.argv[2]
-l_atom = sys.argv[3]        #Label/Index of the central atom
+l_atom = sys.argv[3]        #Label/Index of the central atom, start 0-indexed
 extra_atom = sys.argv[4]    #Add an extra atom label to the xyz / yes or no
 e_atom = sys.argv[5]        #Label of the extra atom to add in each cluster or type no
 
@@ -106,8 +106,8 @@ for i in range(snaps):
             cluster = cluster.append(dataf_xyz.iloc[s], ignore_index = True)
 
     else:  #If sys.argv[3] is the index of the central atom
-        orig_label = dataf_xyz.iloc[int(sys.argv[3])+1, dataf_xyz.columns.get_loc('Label')]
-        dataf_xyz.iloc[int(sys.argv[3])+1, dataf_xyz.columns.get_loc('Label')] = 'Ix'
+        orig_label = dataf_xyz.iloc[int(sys.argv[3]), dataf_xyz.columns.get_loc('Label')]
+        dataf_xyz.iloc[int(sys.argv[3]), dataf_xyz.columns.get_loc('Label')] = 'Ix'
         l_atom = 'Ix'
         l = np.zeros((len(dataf_xyz[dataf_xyz['Label'] == 'O']), 2), dtype=float)
         for j in range(len(dataf_xyz[dataf_xyz['Label'] == 'O'])):
