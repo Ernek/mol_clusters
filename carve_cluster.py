@@ -53,7 +53,7 @@ else:
 snaps = int(len(infile_lines)/(N+2))
 print(f'There are {snaps} snapshots in the {infile.name} file')
 
-outf_name = f"cluster_N_{mol_number}.xyz""
+outf_name = f"cluster_N_{mol_number}.xyz"
 try:
     os.remove(outf_name)
     print(f'Previous file {outf_name} was removed')
